@@ -17,7 +17,7 @@ public class Capteur {
     }
 
 // Getters et setters
-    public String getcode() {
+    public String getCode() {
         return code;
     }
 
@@ -37,40 +37,41 @@ public class Capteur {
         return humidite;
     }
 
+
 // Fonctions 
 
     //Génère une température aléatoirement
-    private float genereTemperature() {
+    private float genererTemperature() {
         Random random = new Random();
         return -5 + random.nextFloat() * 30; // Température entre -5 et 30 degrés Celsius
     }
 
     //Génère une humidité aléatoirement
-    private float genereHumidite() {
+    private float genererHumidite() {
         Random random = new Random();
         return random.nextFloat() * 100; // Humidité entre 0% et 100%
     }
 
     //Remonte une temperature a la central
     public void remonterTemperature(CentraleGestion centrale) {
-        this.temperature = genereTemperature();
+        this.temperature = genererTemperature();
         centrale.enregistrerTemperature(this.code, this.temperature);
     }
 
     //Remonte une humidite 
     public void remonterHumidite(CentraleGestion centrale) {
-        this.humidite = genereHumidite();
+        this.humidite = genererHumidite();
         centrale.enregistrerHumidite(this.code, this.humidite);
     }
 
     //Daclare un ajout auprès de la centrale
     public void declarerAjout(CentraleGestion centrale) {
-        centrale.ajoutCapteur(this.code);
+        centrale.ajouterCapteur(this);
     }
 
     //Declare un retrait auprès de la centrale
     public void declarerRetrait(CentraleGestion centrale) {
-        centrale.retirerCapteur(this.code);
+        centrale.retirerCapteur(this);
     }
 
 }

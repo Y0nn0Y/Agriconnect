@@ -17,7 +17,7 @@ public class CapteurTest {
 
     // Méthode pour afficher les informations d'un capteur
     private static void afficherInformationsCapteur(Capteur capteur) {
-        System.out.println("Code du capteur: " + capteur.getcode());
+        System.out.println("Code du capteur: " + capteur.getCode());
         System.out.println("Latitude: " + capteur.getLatitude());
         System.out.println("Longitude: " + capteur.getLongitude());
         System.out.println("Température: " + capteur.getTemperature() + " °C");
