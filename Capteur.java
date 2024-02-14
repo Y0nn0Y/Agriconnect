@@ -40,15 +40,15 @@ public class Capteur {
 // Fonctions
 
     //Génère une température aléatoirement
-    private double genereTemperature() {
+    private float genereTemperature() {
         Random random = new Random();
-        return -5 + random.nextDouble() * 30; // Température entre -5 et 30 degrés Celsius
+        return -5 + random.nextFloat() * 30; // Température entre -5 et 30 degrés Celsius
     }
 
     //Génère une humidité aléatoirement
-    private double genereHumidite() {
+    private float genereHumidite() {
         Random random = new Random();
-        return random.nextDouble() * 100; // Humidité entre 0% et 100%
+        return random.nextFloat() * 100; // Humidité entre 0% et 100%
     }
 
     //Remonte une temperature a la central
@@ -72,3 +72,5 @@ public class Capteur {
     public void declarerRetrait(CentraleGestion centrale) {
         centrale.retirerCapteur(this.code);
     }
+
+}
