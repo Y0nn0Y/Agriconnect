@@ -5,7 +5,7 @@ import java.util.Random;
 import centrale.CentraleGestion;
 
 public class Capteur extends UnicastRemoteObject implements InterfaceCapteur {
-    
+
     // Déclaration variable
     private String code;
     private double latitude;
@@ -72,13 +72,13 @@ public class Capteur extends UnicastRemoteObject implements InterfaceCapteur {
     //Daclare un ajout auprès de la centrale
     public void declarerAjout(CentraleGestion centrale) throws RemoteException {
         centrale.ajouterCapteur(this);
-        System.out.println("Capteur " + code + " ajouté avec succès.");
+        System.out.println("\nCapteur " + code + " ajouté avec succès.");
     }
 
     //Declare un retrait auprès de la centrale
     public void declarerRetrait(CentraleGestion centrale) throws RemoteException {
         centrale.retirerCapteur(this);
-        System.out.println("Capteur " + code + " retiré avec succès.");
+        System.out.println("\nCapteur " + code + " retiré avec succès.");
     }
 
 }
