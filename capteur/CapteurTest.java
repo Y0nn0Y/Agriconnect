@@ -1,3 +1,7 @@
+package capteur;
+
+import centrale.CentraleGestion;
+
 public class CapteurTest {
 
     public static void main(String[] args) {

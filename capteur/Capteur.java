@@ -1,4 +1,6 @@
+package capteur;
 import java.util.Random;
+import centrale.CentraleGestion;
 
 public class Capteur {
 
@@ -69,11 +71,13 @@ public class Capteur {
     //Daclare un ajout auprès de la centrale
     public void declarerAjout(CentraleGestion centrale) {
         centrale.ajouterCapteur(this);
+        System.out.println("Capteur " + code + " ajouté avec succès.");
     }
 
     //Declare un retrait auprès de la centrale
     public void declarerRetrait(CentraleGestion centrale) {
         centrale.retirerCapteur(this);
+        System.out.println("Capteur " + code + " retiré avec succès.");
     }
 
 }
