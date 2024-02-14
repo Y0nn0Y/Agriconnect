@@ -1,18 +1,20 @@
 package capteur;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import centrale.CentraleGestion;
 
-public class Capteur {
-
-// Déclaration variable
+public class Capteur extends UnicastRemoteObject implements InterfaceCapteur {
+    
+    // Déclaration variable
     private String code;
     private double latitude;
     private double longitude;
     private float temperature;
     private float humidite;
 
-// Constructeur (code et coordonnées)
-    public Capteur(String code, double latitude, double longitude) {
+    // Constructeur (code et coordonnées)
+    public Capteur(String code, double latitude, double longitude) throws RemoteException {
         this.code = code;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -39,7 +41,6 @@ public class Capteur {
         return humidite;
     }
 
-
 // Fonctions 
 
     //Génère une température aléatoirement
@@ -57,25 +58,25 @@ public class Capteur {
     }
 
     //Remonte une temperature a la central
-    public void remonterTemperature(CentraleGestion centrale) {
+    public void remonterTemperature(CentraleGestion centrale) throws RemoteException {
         this.temperature = genererTemperature();
         centrale.enregistrerTemperature(this.code, this.temperature);
     }
 
     //Remonte une humidite 
-    public void remonterHumidite(CentraleGestion centrale) {
+    public void remonterHumidite(CentraleGestion centrale) throws RemoteException {
         this.humidite = genererHumidite();
         centrale.enregistrerHumidite(this.code, this.humidite);
     }
 
     //Daclare un ajout auprès de la centrale
-    public void declarerAjout(CentraleGestion centrale) {
+    public void declarerAjout(CentraleGestion centrale) throws RemoteException {
         centrale.ajouterCapteur(this);
         System.out.println("Capteur " + code + " ajouté avec succès.");
     }
 
     //Declare un retrait auprès de la centrale
-    public void declarerRetrait(CentraleGestion centrale) {
+    public void declarerRetrait(CentraleGestion centrale) throws RemoteException {
         centrale.retirerCapteur(this);
         System.out.println("Capteur " + code + " retiré avec succès.");
     }

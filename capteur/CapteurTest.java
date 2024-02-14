@@ -1,10 +1,11 @@
 package capteur;
 
+import java.rmi.RemoteException;
 import centrale.CentraleGestion;
 
 public class CapteurTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RemoteException {
         // Création d'une instance de CentraleGestion (pour simuler la centrale)
         CentraleGestion centrale = new CentraleGestion();
 
@@ -19,7 +20,7 @@ public class CapteurTest {
         afficherInformationsCapteur(capteur);
     }
 
-    // Méthode pour afficher les informations d'un capteur
+    // Méthode pour afficher les tester affichage d'un capteur
     private static void afficherInformationsCapteur(Capteur capteur) {
         System.out.println("Code du capteur: " + capteur.getCode());
         System.out.println("Latitude: " + capteur.getLatitude());
