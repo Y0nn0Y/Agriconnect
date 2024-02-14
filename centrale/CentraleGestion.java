@@ -1,44 +1,47 @@
 package centrale;
-import java.util.ArrayList;
-import java.util.List;
 
-import capteur.Capteur;
+import capteur.InterfaceCapteur;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
 
-public class CentraleGestion {
-    private List<Capteur> capteurs;
-    private int intervalleMesure; // en secondes
+public class CentraleGestion extends UnicastRemoteObject implements InterfaceCentrale {
 
-    // Constructeur
-    public CentraleGestion() {
-        this.capteurs = new ArrayList<>();
-        this.intervalleMesure = intervalleMesure;
+    private Map<String, InterfaceCapteur> capteurs;
+
+    public CentraleGestion() throws RemoteException {
+        capteurs = new HashMap<>();
     }
 
-    // Méthode pour ajouter un capteur à la liste
-    public void ajouterCapteur(Capteur capteur) {
-        capteurs.add(capteur);
+    @Override
+    public void ajouterCapteur(InterfaceCapteur capteur) throws RemoteException {
+        capteurs.put(capteur.getCode(), capteur);
+        System.out.println("Capteur " + capteur.getCode() + " ajouté à la centrale.");
     }
 
-    // Méthode pour retirer un capteur de la liste
-    public void retirerCapteur(Capteur capteur) {
-        capteurs.remove(capteur);
+    @Override
+    public void retirerCapteur(InterfaceCapteur capteur) throws RemoteException {
+        capteurs.remove(capteur.getCode());
+        System.out.println("Capteur " + capteur.getCode() + " retiré de la centrale.");
     }
 
-    // Méthode pour enregistrer la température d'un capteur
-    public void enregistrerTemperature(String codeCapteur, double temperature) {
-        return;
+    @Override
+    public void enregistrerTemperature(String codeCapteur, float temperature) throws RemoteException {
+        System.out.println("Nouvelle température enregistrée pour le capteur " + codeCapteur + ": " + temperature + " °C");
     }
 
-    // Méthode pour enregistrer l'humidité d'un capteur
-    public void enregistrerHumidite(String codeCapteur, double humidite) {
-        return;
+    @Override
+    public void enregistrerHumidite(String codeCapteur, float humidite) throws RemoteException {
+        System.out.println("Nouvelle humidité enregistrée pour le capteur " + codeCapteur + ": " + humidite + "%");
     }
 
-    // Méthode pour afficher les informations de tous les capteurs
-    public void afficherInformations() {
-        for (Capteur capteur : capteurs) {
-            System.out.println("Capteur: " + capteur.getCode() + ", Coordonnées latitude: " + capteur.getLatitude() + ", Coordonnées longitude: " + capteur.getLongitude());
-            System.out.println("Température: " + capteur.getTemperature() + " °C, Humidité: " + capteur.getHumidite() + "%");
+    // Fonction pour afficher les informations des capteurs
+    public void afficherInformationsCapteurs() throws RemoteException {
+        System.out.println("\n--- Informations des capteurs ---");
+        for (InterfaceCapteur capteur : capteurs.values()) {
+            System.out.println("Capteur " + capteur.getCode() +
+                    " - Température: " + capteur.getTemperature() + " °C, Humidité: " + capteur.getHumidite() + "%");
         }
     }
 }

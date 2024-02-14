@@ -32,7 +32,7 @@ public class CapteurTest {
     }
 
     // Méthode pour afficher les tester affichage d'un capteur (se trouve sur la centrale en principe)
-    private static void afficherInformationsCapteur(Capteur capteur) {
+    private static void afficherInformationsCapteur(Capteur capteur) throws RemoteException {
         System.out.println("Code du capteur: " + capteur.getCode());
         System.out.println("Latitude: " + capteur.getLatitude());
         System.out.println("Longitude: " + capteur.getLongitude());
