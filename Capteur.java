@@ -37,7 +37,7 @@ public class Capteur {
         return humidite;
     }
 
-// Fonctions
+// Fonctions 
 
     //Génère une température aléatoirement
     private float genereTemperature() {
