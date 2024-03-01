@@ -57,7 +57,7 @@ public class Capteur
     {
         try
         {
-            // Récupération de la référence de l'objet distant Centrale
+            // Récupération de la référence de l'objet distant centrale
             Centrale centrale = (Centrale) Naming.lookup("rmi://localhost/Centrale");
 
             // Génération aléatoire des attributs du capteur
@@ -79,19 +79,19 @@ public class Capteur
                 public void run()
                 {
                     // Génération de valeurs aléatoires pour la température et l'humidité
-                    int temperature = generateRandomValue(20, 30);  // Exemple : valeurs entre 20 et 30 pourcents
-                    int humidite = generateRandomValue(40, 60);     // Exemple : valeurs entre 40 et 60 pourcents
+                    int temperature = generateRandomValue(20, 30);
+                    int humidite = generateRandomValue(40, 60);
                     
                     try {
-                        // Transmission des données à la Centrale
-                        centrale.transmettreDonnees(ID, temperature, humidite);
+                        // Transmission des données à la centrale
+                        centrale.enregistrerMesures(ID, temperature, humidite);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
                     executionCount[0]++;
                     if(executionCount[0] >= 10)
                     {
-                        // // Arrêt de la tâche après dix exécutions et retrait du capteur de la Centrale
+                        // // Arrêt de la tâche après dix exécutions et retrait du capteur de la centrale
                         timer.cancel();
                         try
                         {
