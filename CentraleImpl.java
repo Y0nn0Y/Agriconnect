@@ -1,8 +1,3 @@
-/*
- * Cette classe est conçue pour être utilisée dans un système de surveillance avec des capteurs qui enregistrent des mesures de température et d'humidité.
- * Elle agit comme un serveur RMI central qui gère ces capteurs.
- */
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -18,24 +13,44 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
 
+/**
+ * Cette classe représente l'implémentation d'une centrale météorologique utilisant RMI (Remote Method Invocation).
+ * Elle utilise la bibliothèque RMI pour permettre la communication avec les capteurs météorologiques distants.
+ *
+ * @author Enzo Soulan
+ * @author Yon Beaurain
+ * @version 2.0
+ * @since 2024-03-01
+ */
 public class  CentraleImpl extends UnicastRemoteObject implements Centrale
 {
-    private static HashMap<String, Capteur> capteurs;       // Collection pour stocker des capteurs associés à un code unique
+    // Collection HashMap stockant les capteurs associés à leurs codes uniques.
+    private static HashMap<String, Capteur> capteurs;
     
-    // Constructeur de la classe
+    /**
+     * Constructeur par défaut de la classe CentraleImpl.
+     *
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public CentraleImpl() throws RemoteException { 
         super();
         capteurs = new HashMap<String, Capteur>();
     }
     
-    // Ajoute un capteur à la collection synchronisée
+    /**
+     * Ajoute un nouveau capteur à la centrale avec l'intervalle spécifié.
+     *
+     * @param intervalle Intervalle de mesure du capteur.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     * @throws MalformedURLException En cas d'URL mal formée lors de la communication avec le capteur.
+     * @throws NotBoundException Lorsque le capteur distant n'est pas lié correctement.
+     */
     public synchronized void ajouterCapteur(int intervalle) throws RemoteException, MalformedURLException, NotBoundException {
         Capteur capteur = new Capteur();
         
         capteurs.put(capteur.getCodeUnique(), capteur);
-        System.out.println("Capteur " + capteur.getCodeUnique() + " de coordonnées " + capteurs.get(capteur.getCodeUnique()).getCoordonneesGPS() + " et d'intervalle " + intervalle + " ajouté.");
+        System.out.println("\nCapteur " + capteur.getCodeUnique() + " de coordonnées " + capteurs.get(capteur.getCodeUnique()).getCoordonneesGPS() + " et d'intervalle " + intervalle + " ajouté.");
         try {
             capteur.demarrer(intervalle);
         } catch (MalformedURLException | RemoteException | NotBoundException e) {
@@ -43,28 +58,45 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
         }        
     }
 
-    // Retirer un capteur de la collection synchronisée
+    /**
+     * Retire le capteur associé au code unique spécifié.
+     *
+     * @param codeUnique Code unique du capteur à retirer.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public synchronized void retirerCapteur(String codeUnique) throws RemoteException {
         capteurs.get(codeUnique).arreter(codeUnique);
         capteurs.remove(codeUnique);
-        System.out.println("Capteur " + codeUnique + " retiré.");
+        System.out.println("\nCapteur " + codeUnique + " retiré.");
 
     }
 
-    // Lister les capteurs de la collection
+    /**
+     * Liste tous les codes uniques des capteurs enregistrés dans la centrale.
+     *
+     * @return Liste des codes uniques des capteurs.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public String listerCapteurs() throws RemoteException {
         StringBuilder liste = new StringBuilder();
-        liste.append("Liste des capteurs :\n");
+        liste.append("\nListe des capteurs :");
     
         for (String codeUnique : capteurs.keySet()) {
-            liste.append("- Capteur ").append(codeUnique).append("\n");
+            liste.append("\n- Capteur ").append(codeUnique);
         }
 
         String message = liste.toString();
         return message;
     }
 
-    // Enregistre et affiche la température et l'humidité depuis un capteur ainsi que l'heure du relevé
+    /**
+     * Enregistre les mesures de température et d'humidité pour un capteur spécifié.
+     *
+     * @param codeUnique Code unique du capteur.
+     * @param temperature Température enregistrée.
+     * @param humidite Humidité enregistrée.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public void enregistrerMesures(String codeUnique, int temperature, int humidite) throws RemoteException {
         LocalDateTime heureActuelle = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -81,7 +113,13 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
         System.out.println("\nLe capteur " + codeUnique + " a enregistré de nouvelles mesures :\n- Température = " + temperature + " ;\n- Humidité = " + humidite + " ;");
     }
 
-    // Obtient la dernière mesure enregistrée dans le fichier
+    /**
+     * Récupère la dernière mesure enregistrée pour un capteur spécifié.
+     *
+     * @param codeUnique Code unique du capteur.
+     * @return Message contenant la dernière mesure ou une notification d'absence de mesures.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public String obtenirDerniereMesure(String codeUnique) throws RemoteException {
         String nomFichier = codeUnique + "_mesures.txt";
         String message = "";
@@ -96,9 +134,9 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
             }
     
             if (derniereMesure != null) {
-                message += "Dernière mesure pour le capteur " + codeUnique + " :\n" + derniereMesure;
+                message += "\nDernière mesure pour le capteur " + codeUnique + " :\n" + derniereMesure;
             } else {
-                message += "Aucune mesure enregistrée pour le capteur " + codeUnique + ".";
+                message += "\nAucune mesure enregistrée pour le capteur " + codeUnique + ".";
             }
     
         } catch (IOException e) {
@@ -108,7 +146,14 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
         return message;
     }
 
-    // Obtient la moyenne des températures et humidités sur la dernière heure ou dernière journée pour un capteur
+    /**
+     * Calcule et retourne les moyennes de température et d'humidité ainsi que les tendances sur une période spécifiée.
+     *
+     * @param codeUnique Code unique du capteur.
+     * @param periode     Période de calcul des moyennes et tendances ("heure" ou "jour").
+     * @return Message contenant les moyennes, tendances et informations sur la période spécifiée.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public String obtenirMoyennesTendances(String codeUnique, String periode) throws RemoteException {
         String nomFichier = codeUnique + "_mesures.txt";
         LocalDateTime now = LocalDateTime.now();
@@ -127,7 +172,7 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
                 if ("heure".equalsIgnoreCase(periode) && time.isAfter(now.minusHours(1))) {
                     temperatures.add(temperature);
                     humidites.add(humidite);
-                } else if ("jour".equalsIgnoreCase(periode) && time.isAfter(now.minusDays(1))) {
+                } else if ("journée".equalsIgnoreCase(periode) && time.isAfter(now.minusDays(1))) {
                     temperatures.add(temperature);
                     humidites.add(humidite);
                 }
@@ -142,20 +187,26 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
                 String tendanceTemperature = determinerTendance(temperatures);
                 String tendanceHumidite = determinerTendance(humidites);
 
-                return String.format("Moyenne sur la dernière %s :\n- Température : %.2f\n- Humidité : %.2f\nTendances :\n- Température : %s\n- Humidité : %s",
-                        periode, moyenneTemperature, moyenneHumidite, tendanceTemperature, tendanceHumidite);
+                return String.format("\nMoyennes sur la dernière %s :\n- Température : %.2f\n- Humidité : %.2f\n\nTendances sur la dernière %s :\n- Température : %s\n- Humidité : %s",
+                        periode, moyenneTemperature, moyenneHumidite, periode, tendanceTemperature, tendanceHumidite);
             } else {
-                return "Aucune mesure disponible pour le capteur " + codeUnique + " dans la période spécifiée.";
+                return "\nAucune mesure disponible pour le capteur " + codeUnique + " dans la période spécifiée.";
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            return "Erreur lors de la lecture du fichier.";
+            return "\nLe fichier est introuvable.";
         }
     }
 
 
-    // Déterminer la tendance (hausse, baisse, stable) d'une liste de mesures
+    /**
+     * Détermine la tendance des valeurs fournies (à la hausse, à la baisse ou stable).
+     *
+     * @param valeurs Liste des valeurs pour lesquelles la tendance doit être déterminée.
+     * @return Chaîne indiquant la tendance des valeurs.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     */
     public String determinerTendance(List<Integer> valeurs) throws RemoteException {
         int taille = valeurs.size();
         if (taille >= 2) {
@@ -170,15 +221,32 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
                 return "Stable";
             }
         } else {
-            return "Insuffisant de données pour déterminer la tendance.";
+            return "\nInsuffisant de données pour déterminer la tendance.";
         }
     }
 
+    /**
+     * Modifie l'intervalle de mesure d'un capteur spécifié.
+     *
+     * @param codeUnique Code unique du capteur.
+     * @param nouvelIntervalle Nouvel intervalle de mesure.
+     * @throws MalformedURLException En cas d'URL mal formée lors de la communication avec le capteur.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     * @throws NotBoundException Lorsque le capteur distant n'est pas lié correctement.
+     */
     public void modifierIntervalleCapteur(String codeUnique, int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException {
         Capteur capteur = capteurs.get(codeUnique);
         capteur.resetTimer(nouvelIntervalle);
     }
 
+    /**
+     * Modifie l'intervalle de mesure de tous les capteurs enregistrés dans la centrale.
+     *
+     * @param nouvelIntervalle Nouvel intervalle de mesure global.
+     * @throws MalformedURLException En cas d'URL mal formée lors de la communication avec le capteur.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     * @throws NotBoundException Lorsque le capteur distant n'est pas lié correctement.
+     */
     public void modifierIntervalleGlobal(int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException {
         for (String codeUnique : capteurs.keySet()) {
             Capteur capteur = capteurs.get(codeUnique);
@@ -186,16 +254,19 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
         }
     }
 
+    /**
+     * Méthode principale exécutée lors du lancement de l'application.
+     * Créé une centrale et un registre sur le port 1099, puis relie la centrale au registre.
+     *
+     * @param args Arguments de la ligne de commande.
+     * @throws RemoteException En cas d'erreur lors de la communication distante.
+     * @throws AlreadyBoundException Lorsque la centrale est déjà liée au registre RMI.
+     */
     public static void main(String args[]) throws RemoteException, AlreadyBoundException {   
         try {
-            // Création d'une centrale
             CentraleImpl centrale = new CentraleImpl();
-
-            // Création d'un registre RMI sur le port 1099
-            Registry registry = LocateRegistry.createRegistry(1099);
-
-            // Liaison de la centrale au registre RMI avec le nom "Centrale"
-            registry.bind("Centrale", centrale);
+            Registry registre = LocateRegistry.createRegistry(1099);
+            registre.bind("Centrale", centrale);
         } catch(RemoteException re) {
             re.printStackTrace();
         }
