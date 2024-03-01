@@ -1,5 +1,6 @@
 # AGRICONNECT
 - M1 STRI 2023/2024
+- Modèles et Concepts du Parallélisme et de la Répartition
 - Projet JAVA – Sockets/RMI
 - Conception : Emma Guillemet & Matteo Léger
 - Code : Enzo Soulan & Yon Beaurain
