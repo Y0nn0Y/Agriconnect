@@ -5,40 +5,51 @@
  * Après dix transmissions, le capteur est retiré de la Centrale.
  */
 
-import java.rmi.*;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.net.*;
 
-public class Capteur
-{
-    private String codeUnique;                      // Code identifiant le capteur
-    private Double latitude;                        // Latitude du capteur
-    private Double longitude;                       // Longitude du capteur
-    private static Random random = new Random();    // Génération aléatoire de coordonnées
-
+public class Capteur {
+    private Centrale centrale;
+    private String codeUnique;                          // Code identifiant le capteur
+    private Double latitude;                            // Latitude du capteur
+    private Double longitude;                           // Longitude du capteur
+    private Timer timer;                                // Création d'une tâche de minuterie pour simuler l'enregistrement de données à intervalles réguliers
+    private static Random random = new Random();        // Génération aléatoire de coordonnées
+    
     // Constructeur de la classe
-    public Capteur(String codeUnique, Double latitude, Double longitude)
-    {
-        this.codeUnique = codeUnique;
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public Capteur() throws RemoteException, NotBoundException, MalformedURLException {
+        // Récupération de la référence de l'objet distant Centrale
+        this.centrale = (Centrale) Naming.lookup("rmi://localhost/Centrale");
+        // Génération aléatoire des attributs du capteur
+        this.codeUnique = generateCodeUnique();
+        this.latitude = generateRandomCoordinate();
+        this. longitude = generateRandomCoordinate();
+        this.timer = new Timer();
     }
 
     // Getter sur le code identifiant le capteur
-    public String getCodeUnique()
-    {
+    public String getCodeUnique() {
         return codeUnique;
     }
 
     // Getter sur le code identifiant le capteur
-    public String getCoordonneesGPS()
-    {
+    public String getCoordonneesGPS() {
         return latitude + ", " + longitude;
     }
 
-    // Génère un entier compris entre min et max (pour les coordonnées)
+    // Reset le timer du capteur
+    public void resetTimer(int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException {
+        timer.cancel();                 // Annulation de la tâche actuelle
+        timer = new Timer();            // Création d'un nouveau Timer et planification de la tâche avec le nouvel intervalle
+        demarrer(nouvelIntervalle);
+    }
+
+    // Génère un entier compris entre min et max (pour la température et l'humidité)
     private static int generateRandomValue(int min, int max) {
         return min + random.nextInt(max - min + 1);
     }
@@ -53,69 +64,24 @@ public class Capteur
         return -90 + (180 * random.nextDouble());
     }
 
-    public static void main(String args[])
-    {
-        try
-        {
-            // Récupération de la référence de l'objet distant centrale
-            Centrale centrale = (Centrale) Naming.lookup("rmi://localhost/Centrale");
-
-            // Génération aléatoire des attributs du capteur
-            String ID = generateCodeUnique();
-            Double lat = generateRandomCoordinate();
-            Double lon = generateRandomCoordinate();
-            
-            // Ajout du capteur à la centrale
-            centrale.ajouterCapteur(ID, lat, lon);
-
-            // // Création d'une tâche de minuterie pour simuler la transmission de données à intervalle réguliers
-            Timer timer = new Timer();
-            
-            // Limiter le nombre d'exécutions de la transmission des données (afin de retirer le capteur à la fin)
-            final int[] executionCount = {0};
-
-            TimerTask task = new TimerTask()
-            {
-                public void run()
-                {
-                    // Génération de valeurs aléatoires pour la température et l'humidité
-                    int temperature = generateRandomValue(20, 30);
-                    int humidite = generateRandomValue(40, 60);
-                    
-                    try {
-                        // Transmission des données à la centrale
-                        centrale.enregistrerMesures(ID, temperature, humidite);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                    executionCount[0]++;
-                    if(executionCount[0] >= 10)
-                    {
-                        // // Arrêt de la tâche après dix exécutions et retrait du capteur de la centrale
-                        timer.cancel();
-                        try
-                        {
-                            centrale.retirerCapteur(ID);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    }
+    public void demarrer(int intervalle) throws MalformedURLException, RemoteException, NotBoundException {
+        TimerTask task = new TimerTask() {
+            public void run() {
+                // Génération de valeurs aléatoires pour la température et l'humidité
+                int temperature = generateRandomValue(20, 30);
+                int humidite = generateRandomValue(40, 60);
+                try {
+                    centrale.enregistrerMesures(codeUnique, temperature, humidite);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
-            };
-            // Planification de la tâche pour être exécutée toutes les 5 secondes (5000 millisecondes)
-            timer.schedule(task, 0, 5000);
-        }
-        catch(RemoteException re)
-        {
-            re.printStackTrace();
-        }
-        catch(NotBoundException nbe)
-        {
-            nbe.printStackTrace();
-        }
-        catch(MalformedURLException mfe)
-        {
-            mfe.printStackTrace();
-        }
+            }
+        };
+        // Planification de la tâche pour être exécutée à intervalle définie par le client
+        timer.schedule(task, 0, intervalle);
+    }
+
+    public void arreter(String ID) throws RemoteException {
+        timer.cancel();
     }
 }

@@ -1,18 +1,15 @@
 # AGRICONNECT
-Enzo Soulan & Yon Beaurain
 M1 STRI 2023/2024
+Conception : Emma Guillemet & Matteo Léger
+Code : Enzo Soulan & Yon Beaurain
 
-Exécution de l'application : 
+# Lancement de l'application : 
 
-# Dans une première invite de commandes on compile et lance la centrale :
+1. Dans une première CLI on compile et on lance la centrale :
 - javac CentraleImpl.java (compilation de la centrale)
 - java CentraleImpl (lancement de la centrale)
 
-# Dans une deuxième invite de commandes, on compile et lance le capteur :
+2. Dans une deuxième CLI, on compile et on lance le client :
 - javac Centrale.java (compilation de l'interface de la centrale RMI)
-- javac Capteur.java (compilation du capteur)
-- java Capteur (lancement du capteur)
-
-# Dans une troisième invite de commande 
 - javac Client.java (compilation du client)
 - java Client (lancement du client)

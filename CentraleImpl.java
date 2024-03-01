@@ -8,21 +8,21 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
 
 public class  CentraleImpl extends UnicastRemoteObject implements Centrale
 {
-    // Collection pour stocker des capteurs associés à un code unique
-    private static HashMap<String, Capteur> capteurs;
+    private static HashMap<String, Capteur> capteurs;       // Collection pour stocker des capteurs associés à un code unique
     
     // Constructeur de la classe
     public CentraleImpl() throws RemoteException { 
@@ -31,15 +31,24 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
     }
     
     // Ajoute un capteur à la collection synchronisée
-    public synchronized void ajouterCapteur(String codeUnique, Double latitude, Double longitude) throws RemoteException {
-        capteurs.put(codeUnique, new Capteur(codeUnique, latitude, longitude));
-        System.out.println("Capteur " + codeUnique + " de coordonnées " + capteurs.get(codeUnique).getCoordonneesGPS() + " ajouté.");
+    public synchronized void ajouterCapteur(int intervalle) throws RemoteException, MalformedURLException, NotBoundException {
+        Capteur capteur = new Capteur();
+        
+        capteurs.put(capteur.getCodeUnique(), capteur);
+        System.out.println("Capteur " + capteur.getCodeUnique() + " de coordonnées " + capteurs.get(capteur.getCodeUnique()).getCoordonneesGPS() + " et d'intervalle " + intervalle + " ajouté.");
+        try {
+            capteur.demarrer(intervalle);
+        } catch (MalformedURLException | RemoteException | NotBoundException e) {
+            e.printStackTrace();
+        }        
     }
 
     // Retirer un capteur de la collection synchronisée
     public synchronized void retirerCapteur(String codeUnique) throws RemoteException {
+        capteurs.get(codeUnique).arreter(codeUnique);
         capteurs.remove(codeUnique);
         System.out.println("Capteur " + codeUnique + " retiré.");
+
     }
 
     // Lister les capteurs de la collection
@@ -162,6 +171,18 @@ public class  CentraleImpl extends UnicastRemoteObject implements Centrale
             }
         } else {
             return "Insuffisant de données pour déterminer la tendance.";
+        }
+    }
+
+    public void modifierIntervalleCapteur(String codeUnique, int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException {
+        Capteur capteur = capteurs.get(codeUnique);
+        capteur.resetTimer(nouvelIntervalle);
+    }
+
+    public void modifierIntervalleGlobal(int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException {
+        for (String codeUnique : capteurs.keySet()) {
+            Capteur capteur = capteurs.get(codeUnique);
+            capteur.resetTimer(nouvelIntervalle);
         }
     }
 

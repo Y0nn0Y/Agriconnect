@@ -2,13 +2,14 @@
  * Cette interface RMI définit les méthodes de la centrale qui peuvent être appelées de manière distante.
  */
 
+import java.net.MalformedURLException;
 import java.rmi.*;
 import java.util.List;
 
 public interface Centrale extends Remote
 {
     // Ajoute un capteur avec un code unique, une latitude et une longitude
-    public void ajouterCapteur(String codeUnique, Double latitude, Double longitude) throws RemoteException;
+    public void ajouterCapteur(int intervalle) throws RemoteException, MalformedURLException, NotBoundException;
     
     // Retire un capteur en utilisant son code unique
     public void retirerCapteur(String codeUnique) throws RemoteException;
@@ -27,5 +28,9 @@ public interface Centrale extends Remote
 
     // Déterminer la tendance (hausse, baisse, stable) d'une liste de mesures
     public String determinerTendance(List<Integer> mesures) throws RemoteException;
+
+    public void modifierIntervalleCapteur(String codeUnique, int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException;
+
+    public void modifierIntervalleGlobal(int nouvelIntervalle) throws MalformedURLException, RemoteException, NotBoundException;
     
 }
