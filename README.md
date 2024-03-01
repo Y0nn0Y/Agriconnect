@@ -1,5 +1,6 @@
 # AGRICONNECT
 - M1 STRI 2023/2024
+- Projet JAVA – Sockets/RMI
 - Conception : Emma Guillemet & Matteo Léger
 - Code : Enzo Soulan & Yon Beaurain
 
